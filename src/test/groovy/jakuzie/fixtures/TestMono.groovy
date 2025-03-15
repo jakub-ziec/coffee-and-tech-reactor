@@ -15,6 +15,18 @@ class TestMono<T> extends Mono<T> {
         this.delegate = delegate
     }
 
+    static <T> TestMono<T> fromMonos(Iterable<Mono<T>> monos) {
+        AtomicInteger counter = new AtomicInteger(0)
+        if (monos.isEmpty()) {
+            return new TestMono<T>(counter, Mono.empty())
+        }
+        List<Mono<T>> monosCopy = monos.toList()
+        return new TestMono<T>(counter, Mono.defer {
+            def index = Math.min(counter.incrementAndGet(), monos.size()) - 1
+            return monosCopy[index]
+        })
+    }
+
     static <T> TestMono<T> fromIterable(Iterable<T> values) {
         AtomicInteger counter = new AtomicInteger(0)
         if (values.isEmpty()) {
@@ -47,4 +59,5 @@ class TestMono<T> extends Mono<T> {
     void assertSubscribeCount(int expected) {
         assert counter.get() == expected
     }
+
 }
