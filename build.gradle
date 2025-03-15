@@ -9,48 +9,44 @@ plugins {
 group = 'jakuzie'
 version = '0.0.1-SNAPSHOT'
 
-idea {
-	module {
-		downloadSources = true
-	}
-}
-
-java {
-	toolchain {
-		languageVersion = JavaLanguageVersion.of(21)
-	}
-}
-
 ext {
-
+	springCloudVersion="2024.0.0"
 }
 
-repositories {
-	mavenCentral()
-}
+subprojects {
+	apply plugin: 'java'
+	apply plugin: 'groovy'
+	apply plugin: 'org.springframework.boot'
+	apply plugin: 'io.spring.dependency-management'
+	apply plugin: 'idea'
 
-dependencies {
-	implementation 'org.springframework.boot:spring-boot-starter-webflux'
-	implementation "org.projectlombok:lombok"
-	
-	annotationProcessor "org.projectlombok:lombok"
-	annotationProcessor "org.springframework.boot:spring-boot-configuration-processor"
+	idea {
+		module {
+			downloadSources = true
+		}
+	}
 
-	testImplementation 'org.springframework.boot:spring-boot-starter-test'
-	testImplementation 'io.projectreactor:reactor-test'
-	testImplementation 'org.spockframework:spock-core:2.4-M4-groovy-4.0'
-	testImplementation 'org.spockframework:spock-spring:2.4-M4-groovy-4.0'
+	java {
+		toolchain {
+			languageVersion = JavaLanguageVersion.of(21)
+		}
+	}
 
+	repositories {
+		mavenCentral()
+	}
 
-	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
-}
+	dependencyManagement {
+		imports {
+			mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
+		}
+	}
 
-dependencyManagement {
-	imports {
-
+	tasks.named('test') {
+		useJUnitPlatform()
 	}
 }
 
-tasks.named('test') {
-	useJUnitPlatform()
-}
+
+
+

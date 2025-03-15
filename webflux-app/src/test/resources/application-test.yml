@@ -1,0 +1,5 @@
+server:
+  port: 18081
+
+app:
+  remote-service-url: http://localhost:19999

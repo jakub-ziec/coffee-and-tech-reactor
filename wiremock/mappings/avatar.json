@@ -1,0 +1,13 @@
+{
+  "request": {
+    "method": "GET",
+    "urlPathPattern": "/random-avatar"
+  },
+  "response": {
+    "status": 200,
+    "body" : "{\"avatarUrl\": \"https://placehold.co/400\"}",
+    "headers": {
+      "Content-Type": "application/json"
+    }
+  }
+}

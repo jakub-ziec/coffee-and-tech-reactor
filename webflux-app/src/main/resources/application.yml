@@ -1,0 +1,27 @@
+server:
+  port: 8081
+spring:
+  application.name: webflux-app
+  security:
+    user:
+      name: user
+      password: user
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: guest
+    password: guest
+  cloud:
+    stream.bindings:
+      onLikeEvent-in-0:
+        destination: likes
+        group: flux
+      onLikeEvent-out-0:
+        destination: liked-post-titles
+
+app:
+  remote-service-url: http://localhost:9999
+
+logging:
+  org.springframework.amqp.rabbit: DEBUG
+  org.springframework.data.mongodb.core.ReactiveMongoTemplate: DEBUG

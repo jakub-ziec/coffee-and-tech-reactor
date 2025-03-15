@@ -1,1 +1,3 @@
 rootProject.name = 'coffee-and-tech-reactor'
+include 'servlet-app'
+include 'webflux-app'

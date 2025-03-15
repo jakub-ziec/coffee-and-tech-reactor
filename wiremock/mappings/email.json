@@ -1,0 +1,13 @@
+{
+  "request": {
+    "method": "POST",
+    "urlPathPattern": "/validate-email"
+  },
+  "response": {
+    "status": 200,
+    "body" : "{\"valid\": true}",
+    "headers": {
+      "Content-Type": "application/json"
+    }
+  }
+}

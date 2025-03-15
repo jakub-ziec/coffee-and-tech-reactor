@@ -1,6 +1,0 @@
-server:
-  tomcat:
-    threads:
-      max: 15
-
-spring.application.name: coffee-and-tech-reactor
