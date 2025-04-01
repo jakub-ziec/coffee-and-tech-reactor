@@ -1,10 +1,14 @@
 package jakuzie.api;
 
+import jakuzie.email.EmailSender;
+import jakuzie.email.EmailSender.WelcomeEmail;
 import jakuzie.exception.InvalidEmailException;
 import jakuzie.mongo.User;
 import jakuzie.mongo.UserRepository;
+import jakuzie.rabbit.EventPublisher;
+import jakuzie.rabbit.EventPublisher.UserCreated;
 import jakuzie.rest.AvatarClient;
-import jakuzie.rest.EmailClient;
+import jakuzie.rest.EmailValidatorClient;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -18,18 +22,25 @@ import reactor.core.publisher.Mono;
 public class UC1_CreateUser {
 
   private final UserRepository userRepository;
-  private final EmailClient emailClient;
+  private final EmailValidatorClient emailValidatorClient;
   private final AvatarClient avatarClient;
+  private final EmailSender emailSender;
+  private final EventPublisher eventPublisher;
 
   @PostMapping("/users")
   public Mono<User> createUser(@RequestBody CreateUserRequest request) {
     return Mono.zip(
-            emailClient.isEmailValid(request.email()),
+            emailValidatorClient.isEmailValid(request.email()),
             avatarClient.getRandomAvatarUrl())
         .flatMap(tuple -> tuple.getT1()
             ? Mono.just(new User(request.email(), tuple.getT2()))
             : Mono.error(new InvalidEmailException(request.email())))
-        .flatMap(userRepository::save);
+        .flatMap(userRepository::save)
+        .flatMap(user -> Mono.zip(
+            eventPublisher.publish(new UserCreated(user.getId()))
+                .thenReturn(true),
+            emailSender.sendEmail(new WelcomeEmail(user.getEmail()))
+        ).thenReturn(user));
   }
 
   public record CreateUserRequest(String email) {

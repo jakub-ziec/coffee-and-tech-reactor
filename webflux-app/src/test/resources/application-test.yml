@@ -1,5 +1,20 @@
 server:
   port: 18081
+spring:
+  main:
+    lazy-initialization: true
+  jmx:
+    enabled: false
+  aot:
+    enabled: true
+  cloud:
+    stream.bindings:
+      onUserCreatedEvent-in-0:
+        destination: "user-created-event"
 
 app:
   remote-service-url: http://localhost:19999
+
+logging:
+  level:
+    org.springframework.boot.autoconfigure: DEBUG

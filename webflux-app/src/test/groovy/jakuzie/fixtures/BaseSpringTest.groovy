@@ -2,13 +2,16 @@ package jakuzie.fixtures
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.github.tomakehurst.wiremock.WireMockServer
+import com.github.tomakehurst.wiremock.client.WireMock
 import com.github.tomakehurst.wiremock.common.ConsoleNotifier
 import io.restassured.RestAssured
 import io.restassured.filter.log.RequestLoggingFilter
 import io.restassured.filter.log.ResponseLoggingFilter
 import io.restassured.http.ContentType
 import io.restassured.specification.RequestSpecification
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.cache.CacheManager
 import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder
 import org.springframework.test.context.ActiveProfiles
 import spock.lang.Shared
@@ -30,10 +33,15 @@ abstract class BaseSpringTest extends Specification {
     private ObjectMapper objectMapper
 
     @Shared
-    private WireMockServer wireMockServer
+    WireMockServer wireMockServer
+
+    @Autowired
+    CacheManager cacheManager
 
     def setupSpec() {
-        wireMockServer = new WireMockServer(options().port(1_9999)
+//        WireMock.configureFor("localhost", 9999)
+
+        wireMockServer = new WireMockServer(options().port(19999)
                 .notifier(new ConsoleNotifier(true)))
         wireMockServer.start()
         requestSpec = RestAssured.given()
@@ -47,10 +55,15 @@ abstract class BaseSpringTest extends Specification {
     }
 
     void setup() {
+//        WireMock.setGlobalFixedDelay(0)
         wireMockServer.resetAll()
         fakeRemoteService = new FakeRemoteService(wireMockServer, objectMapper)
         RestAssured.reset()
         RestAssured.enableLoggingOfRequestAndResponseIfValidationFails(ALL)
+        cacheManager.cacheNames
+                .collect { cacheManager.getCache(it) }
+                .each { it.invalidate() }
+
     }
 
     void cleanupSpec() {

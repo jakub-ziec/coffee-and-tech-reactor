@@ -1,31 +1,31 @@
 package jakuzie;
 
-import jakarta.validation.constraints.NotNull;
-import java.io.PrintWriter;
-import java.io.StringWriter;
+import java.time.Duration;
+import java.util.function.Consumer;
+import java.util.function.Function;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Bean;
-import org.springframework.core.annotation.Order;
 import org.springframework.data.mongodb.repository.config.EnableReactiveMongoRepositories;
-import org.springframework.http.HttpStatus;
+import org.springframework.messaging.Message;
 import org.springframework.stereotype.Component;
-import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.ResponseStatus;
-import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.server.ServerWebExchange;
 import org.springframework.web.server.WebFilter;
 import org.springframework.web.server.WebFilterChain;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-@SpringBootApplication
+@SpringBootApplication(exclude = {
+
+})
 @EnableCaching
 @EnableReactiveMongoRepositories
 @EnableConfigurationProperties
+@Slf4j
 public class WebFluxApplication {
 
 	public static void main(String[] args) {
@@ -50,6 +50,7 @@ public class WebFluxApplication {
 //			return sw.toString(); // security breach! Don't do this in your project. It's just for easier debugging
 //		}
 //	}
+
 
 	@Slf4j
 	@Component

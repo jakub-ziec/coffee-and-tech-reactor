@@ -12,16 +12,22 @@ spring:
     username: guest
     password: guest
   cloud:
-    stream.bindings:
-      onLikeEvent-in-0:
-        destination: likes
-        group: flux
-      onLikeEvent-out-0:
-        destination: liked-post-titles
+#    function:
+#      definition: foo;onLikeEvent
+#    stream:
+#      bindings:
+#        onLikeEvent-in-0:
+#          destination: likes
+#          group: flux
+  #      onLikeEvent-out-0:
+  #        destination: liked-post-titles
+
 
 app:
   remote-service-url: http://localhost:9999
 
 logging:
-  org.springframework.amqp.rabbit: DEBUG
-  org.springframework.data.mongodb.core.ReactiveMongoTemplate: DEBUG
+  level:
+    org.springframework.amqp.rabbit: DEBUG
+    org.springframework.data.mongodb.core.ReactiveMongoTemplate: DEBUG
+    org.springframework.cloud.stream: DEBUG
