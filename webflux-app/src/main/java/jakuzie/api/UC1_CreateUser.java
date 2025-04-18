@@ -36,11 +36,11 @@ public class UC1_CreateUser {
             ? Mono.just(new User(request.email(), tuple.getT2()))
             : Mono.error(new InvalidEmailException(request.email())))
         .flatMap(userRepository::save)
-        .flatMap(user -> Mono.zip(
+        .delayUntil(user -> Mono.zip(
             eventPublisher.publish(new UserCreated(user.getId()))
                 .thenReturn(true),
             emailSender.sendEmail(new WelcomeEmail(user.getEmail()))
-        ).thenReturn(user));
+        ));
   }
 
   public record CreateUserRequest(String email) {

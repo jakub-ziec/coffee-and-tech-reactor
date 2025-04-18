@@ -87,6 +87,7 @@ class UC1_CreateUser_Spec extends BaseSpringTest {
     def "sends event and welcome email"() {
         given:
         emailOutboxRepository.deleteAll().block()
+        testRabbitListener.reset()
         def email = "valid@example.com"
         fakeRemoteService
                 .stubIsEmailValidRespondsOk(email, true)
@@ -101,7 +102,6 @@ class UC1_CreateUser_Spec extends BaseSpringTest {
         then:
         res.statusCode(200)
         emailOutboxRepository.findAll().collectList().block().size() == 1
-
     }
 
     private ValidatableResponse makeRequestCreateUser(String email) {
