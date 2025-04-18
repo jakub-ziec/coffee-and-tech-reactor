@@ -9,7 +9,6 @@ import spock.lang.Timeout
 
 import java.util.concurrent.TimeUnit
 
-import static java.time.Duration.ofMillis
 import static java.time.Duration.ofSeconds
 import static org.awaitility.Awaitility.await
 
@@ -56,9 +55,8 @@ class UC1_CreateUser_Spec extends BaseSpringTest {
         given:
         def email = "valid@example.com"
         fakeRemoteService
-                .stubIsEmailValidRespondsOk(email, true)
-                .stubGetRandomAvatarUrlRespondsOk()
-                .setGlobalFixedDelay(ofMillis(100))
+                .stubIsEmailValidRespondsOk(email, true, 100)
+                .stubGetRandomAvatarUrlRespondsOk("https://placehold.co/400", 100)
 
         when:
         def res = makeRequestCreateUser(email)
@@ -92,6 +90,7 @@ class UC1_CreateUser_Spec extends BaseSpringTest {
         fakeRemoteService
                 .stubIsEmailValidRespondsOk(email, true)
                 .stubGetRandomAvatarUrlRespondsOk()
+        emailSender.setDelay(100)
 
         when:
         def res = makeRequestCreateUser(email)
@@ -101,7 +100,7 @@ class UC1_CreateUser_Spec extends BaseSpringTest {
 
         then:
         res.statusCode(200)
-        emailOutboxRepository.findAll().collectList().block().size() == 1
+        assertEmailSent()
     }
 
     private ValidatableResponse makeRequestCreateUser(String email) {
@@ -111,6 +110,11 @@ class UC1_CreateUser_Spec extends BaseSpringTest {
                 ])
                 .post('/users')
                 .then()
+    }
+
+    private void assertEmailSent() {
+        def emailSent = emailOutboxRepository.findAll().collectList().block().size() == 1
+        assert emailSent: "Expected email to be sent, but it was not."
     }
 
 }

@@ -2,6 +2,7 @@ package jakuzie.rabbit;
 
 import static jakuzie.rabbit.RabbitConfig.USER_CREATED_QUEUE;
 
+import jakuzie.mongo.User;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -27,7 +28,9 @@ public class EventPublisher {
   }
 
   public record UserCreated(UUID userId) {
-
+    public UserCreated(User user) {
+      this(user.getId());
+    }
   }
 
 }

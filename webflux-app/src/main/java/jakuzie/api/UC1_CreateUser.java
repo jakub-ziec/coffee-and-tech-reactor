@@ -37,9 +37,9 @@ public class UC1_CreateUser {
             : Mono.error(new InvalidEmailException(request.email())))
         .flatMap(userRepository::save)
         .delayUntil(user -> Mono.zip(
-            eventPublisher.publish(new UserCreated(user.getId()))
-                .thenReturn(true),
-            emailSender.sendEmail(new WelcomeEmail(user.getEmail()))
+            eventPublisher.publish(new UserCreated(user))
+                .thenReturn(1),
+            emailSender.sendEmail(new WelcomeEmail(user))
         ));
   }
 

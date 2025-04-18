@@ -19,7 +19,7 @@ class FakeRemoteService {
     WireMockServer wireMockServer
     ObjectMapper objectMapper
 
-    def stubIsEmailValidRespondsOk(String email, boolean valid) {
+    def stubIsEmailValidRespondsOk(String email, boolean valid, int delay = 0) {
         wireMockServer.stubFor(
                 post(urlEqualTo("/validate-email"))
                         .withRequestBody(equalToJson("{\"email\":\"$email\"}"))
@@ -29,12 +29,13 @@ class FakeRemoteService {
                                 .withBody(asJsonString([
                                         "valid": valid
                                 ]))
+                                .withFixedDelay(delay)
                         )
         )
         this
     }
 
-    def stubGetRandomAvatarUrlRespondsOk(String avatarUrl = "https://placehold.co/400") {
+    def stubGetRandomAvatarUrlRespondsOk(String avatarUrl = "https://placehold.co/400", int delay = 0) {
         wireMockServer.stubFor(
                 get(urlEqualTo("/random-avatar"))
                         .willReturn(aResponse()
@@ -43,6 +44,7 @@ class FakeRemoteService {
                                 .withBody(asJsonString([
                                         avatarUrl: avatarUrl
                                 ]))
+                                .withFixedDelay(delay)
                         )
         )
         this

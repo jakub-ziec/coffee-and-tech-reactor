@@ -2,13 +2,13 @@ package jakuzie.fixtures
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.github.tomakehurst.wiremock.WireMockServer
-import com.github.tomakehurst.wiremock.client.WireMock
 import com.github.tomakehurst.wiremock.common.ConsoleNotifier
 import io.restassured.RestAssured
 import io.restassured.filter.log.RequestLoggingFilter
 import io.restassured.filter.log.ResponseLoggingFilter
 import io.restassured.http.ContentType
 import io.restassured.specification.RequestSpecification
+import jakuzie.email.EmailSender
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.cache.CacheManager
@@ -38,6 +38,9 @@ abstract class BaseSpringTest extends Specification {
     @Autowired
     CacheManager cacheManager
 
+    @Autowired
+    EmailSender emailSender
+
     def setupSpec() {
 //        WireMock.configureFor("localhost", 9999)
 
@@ -57,13 +60,14 @@ abstract class BaseSpringTest extends Specification {
     void setup() {
 //        WireMock.setGlobalFixedDelay(0)
         wireMockServer.resetAll()
+        wireMockServer.setGlobalFixedDelay(0)
         fakeRemoteService = new FakeRemoteService(wireMockServer, objectMapper)
         RestAssured.reset()
         RestAssured.enableLoggingOfRequestAndResponseIfValidationFails(ALL)
         cacheManager.cacheNames
                 .collect { cacheManager.getCache(it) }
                 .each { it.invalidate() }
-
+        emailSender.setDelay(0)
     }
 
     void cleanupSpec() {
