@@ -27,7 +27,6 @@ class UC1_CreateUser_Spec extends BaseSpringTest {
                 .stubIsEmailValidRespondsOk(email, true)
                 .stubGetRandomAvatarUrlRespondsOk()
 
-
         when:
         def res = makeRequestCreateUser(email)
 

@@ -1,6 +1,7 @@
 package jakuzie.fixtures
 
 import groovy.util.logging.Slf4j
+import org.springframework.amqp.core.AmqpAdmin
 import org.springframework.amqp.rabbit.annotation.RabbitListener
 import org.springframework.amqp.rabbit.core.RabbitTemplate
 import org.springframework.stereotype.Component
@@ -14,9 +15,11 @@ class TestRabbitListener {
     def userCreatedEvents = new ConcurrentLinkedQueue<String>()
 
     private final RabbitTemplate rabbitTemplate
+    private final AmqpAdmin admin
 
-    TestRabbitListener(RabbitTemplate rabbitTemplate) {
+    TestRabbitListener(RabbitTemplate rabbitTemplate, AmqpAdmin admin) {
         this.rabbitTemplate = rabbitTemplate
+        this.admin = admin
     }
 
     @RabbitListener(queues = "user-created-event")
@@ -26,10 +29,7 @@ class TestRabbitListener {
     }
 
     void reset() {
-        while (rabbitTemplate.receive("user-created-event", 200) != null) {
-            print(".")
-        }
-        println("")
+        admin.purgeQueue("user-created-event")
         userCreatedEvents.clear()
     }
 

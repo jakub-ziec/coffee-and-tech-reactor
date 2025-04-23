@@ -1,8 +1,8 @@
 server:
   port: 18081
-spring:
-  main:
-    lazy-initialization: true
+#spring:
+#  main:
+#    lazy-initialization: true
   jmx:
     enabled: false
   aot:

@@ -9,9 +9,12 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Bean;
+import org.springframework.core.annotation.Order;
 import org.springframework.data.mongodb.repository.config.EnableReactiveMongoRepositories;
 import org.springframework.messaging.Message;
+import org.springframework.security.authorization.AuthorizationDeniedException;
 import org.springframework.stereotype.Component;
+import org.springframework.web.cors.reactive.CorsUtils;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.server.ServerWebExchange;
 import org.springframework.web.server.WebFilter;
@@ -28,14 +31,14 @@ import reactor.core.publisher.Mono;
 @Slf4j
 public class WebFluxApplication {
 
-	public static void main(String[] args) {
-		SpringApplication.run(WebFluxApplication.class, args);
-	}
+  public static void main(String[] args) {
+    SpringApplication.run(WebFluxApplication.class, args);
+  }
 
-	@Bean
-	public WebClient webClient(WebClient.Builder webClientBuilder) {
-		return webClientBuilder.build();
-	}
+  @Bean
+  public WebClient webClient(WebClient.Builder webClientBuilder) {
+    return webClientBuilder.build();
+  }
 
 //	@Slf4j
 //	@RestControllerAdvice
@@ -52,15 +55,20 @@ public class WebFluxApplication {
 //	}
 
 
-	@Slf4j
-	@Component
-	public static class ErrorLoggerWebFilter implements WebFilter {
+  @Slf4j
+  @Component
+  @Order(100)
+  public static class ErrorLoggerWebFilter implements WebFilter {
 
-		@Override
-		public Mono<Void> filter(ServerWebExchange exchange, WebFilterChain chain) {
-			return chain.filter(exchange)
-					.doOnError(e -> log.error("Error: {}", e, e));
-		}
-	}
+    @Override
+    public Mono<Void> filter(ServerWebExchange exchange, WebFilterChain chain) {
+      return chain.filter(exchange)
+          .doOnError(e -> {
+            if (!(e instanceof AuthorizationDeniedException)) {
+              log.error("Error occurred: {}\n⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️", e, e);
+            }
+          });
+    }
+  }
 
 }

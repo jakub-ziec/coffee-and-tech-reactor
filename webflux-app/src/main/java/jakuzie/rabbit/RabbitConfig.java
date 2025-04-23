@@ -2,17 +2,14 @@ package jakuzie.rabbit;
 
 import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
-import java.util.function.Consumer;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.core.AmqpAdmin;
 import org.springframework.amqp.core.Queue;
-import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.amqp.RabbitProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.messaging.Message;
-import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.rabbitmq.RabbitFlux;
 import reactor.rabbitmq.Sender;
@@ -20,13 +17,16 @@ import reactor.rabbitmq.SenderOptions;
 
 @Configuration
 @Slf4j
+@RequiredArgsConstructor
 public class RabbitConfig {
 
   public static final String USER_CREATED_QUEUE= "user-created-event";
+  public static final String POST_CREATED_QUEUE= "post-created-event";
 
   @Autowired
   public void init(AmqpAdmin amqpAdmin) {
     amqpAdmin.declareQueue(new Queue(USER_CREATED_QUEUE, false, false, false));
+    amqpAdmin.declareQueue(new Queue(POST_CREATED_QUEUE, false, false, false));
   }
 
   @Bean
