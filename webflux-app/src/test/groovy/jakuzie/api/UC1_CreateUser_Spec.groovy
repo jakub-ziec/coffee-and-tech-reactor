@@ -103,7 +103,7 @@ class UC1_CreateUser_Spec extends BaseSpringTest {
     }
 
     private ValidatableResponse makeRequestCreateUser(String email) {
-        return requestSpec
+        return requestSpec()
                 .body([
                         email: email
                 ])

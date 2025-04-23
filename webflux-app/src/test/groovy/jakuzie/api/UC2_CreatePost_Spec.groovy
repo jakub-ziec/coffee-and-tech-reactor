@@ -1,22 +1,14 @@
 package jakuzie.api
 
-import io.restassured.response.ValidatableResponse
+
 import jakuzie.fixtures.BaseSpringTest
 import jakuzie.fixtures.TestRabbitListener
-import jakuzie.mongo.PostRepository
-import jakuzie.mongo.SendEmailOutboxRepository
 import jakuzie.rabbit.EventPublisher
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.transaction.ReactiveTransactionManager
-import spock.lang.Timeout
-
-import java.util.concurrent.TimeUnit
 
 import static jakuzie.rabbit.RabbitConfig.POST_CREATED_QUEUE
-import static java.time.Duration.ofSeconds
-import static org.awaitility.Awaitility.await
 
-class UC2_PostUser_Spec extends BaseSpringTest {
+class UC2_CreatePost_Spec extends BaseSpringTest {
 
     @Autowired
     TestRabbitListener testRabbitListener
@@ -32,7 +24,7 @@ class UC2_PostUser_Spec extends BaseSpringTest {
         ]
 
         when:
-        def res = requestSpec
+        def res = requestSpec()
                 .body(body)
                 .auth().basic("user", "user")
                 .post('/posts')
@@ -50,7 +42,7 @@ class UC2_PostUser_Spec extends BaseSpringTest {
         ]
 
         when:
-        def res = requestSpec
+        def res = requestSpec()
                 .body(body)
                 .auth().none()
                 .post('/posts')
@@ -70,7 +62,7 @@ class UC2_PostUser_Spec extends BaseSpringTest {
         eventPublisher.postCreatedQueue = null
 
         when:
-        def res = requestSpec
+        def res = requestSpec()
                 .body(body)
                 .auth().basic("user", "user")
                 .post('/posts')
@@ -85,15 +77,5 @@ class UC2_PostUser_Spec extends BaseSpringTest {
         cleanup:
         eventPublisher.postCreatedQueue = POST_CREATED_QUEUE
     }
-
-
-    private ValidatableResponse makeRequestCreatePost(Map body) {
-        return requestSpec
-                .body(body)
-                .post('/posts')
-                .then()
-    }
-
-
 
 }

@@ -10,6 +10,7 @@ import io.restassured.http.ContentType
 import io.restassured.specification.RequestSpecification
 import jakuzie.WebFluxApplication
 import jakuzie.email.EmailSender
+import jakuzie.mongo.CommentRepository
 import jakuzie.mongo.PostRepository
 import jakuzie.rabbit.RabbitConfig
 import org.springframework.beans.factory.annotation.Autowired
@@ -32,9 +33,6 @@ abstract class BaseSpringTest extends Specification {
     protected FakeRemoteService fakeRemoteService
 
     @Shared
-    protected RequestSpecification requestSpec
-
-    @Shared
     private ObjectMapper objectMapper
 
     @Shared
@@ -49,19 +47,15 @@ abstract class BaseSpringTest extends Specification {
     @Autowired
     PostRepository postRepository
 
+    @Autowired
+    CommentRepository commentRepository
+
     def setupSpec() {
 //        WireMock.configureFor("localhost", 9999)
 
         wireMockServer = new WireMockServer(options().port(19999)
                 .notifier(new ConsoleNotifier(true)))
         wireMockServer.start()
-        requestSpec = RestAssured.given()
-                .baseUri("http://localhost:${1_8081}")
-                .filters(
-                        new RequestLoggingFilter(),
-                        new ResponseLoggingFilter()
-                )
-                .contentType(ContentType.JSON)
         objectMapper = new Jackson2ObjectMapperBuilder().build()
     }
 
@@ -77,10 +71,21 @@ abstract class BaseSpringTest extends Specification {
                 .each { it.invalidate() }
         emailSender.setDelay(0)
         postRepository.deleteAll().block()
+        commentRepository.deleteAll().block()
     }
 
     void cleanupSpec() {
         wireMockServer.stop()
+    }
+
+    static def requestSpec() {
+        RestAssured.given()
+                .baseUri("http://localhost:${1_8081}")
+                .filters(
+                        new RequestLoggingFilter(),
+                        new ResponseLoggingFilter()
+                )
+                .contentType(ContentType.JSON)
     }
 
 }
