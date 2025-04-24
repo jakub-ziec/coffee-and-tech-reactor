@@ -8,7 +8,7 @@ import org.springframework.web.client.RestTemplate;
 
 @Component
 @RequiredArgsConstructor
-public class EmailClient {
+public class EmailValidatorClient {
   private final RestTemplate restTemplate;
   private final AppProperties appProperties;
 

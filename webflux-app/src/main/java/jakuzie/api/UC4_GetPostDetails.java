@@ -4,6 +4,7 @@ import jakuzie.exception.ResourceNotFoundException;
 import jakuzie.mongo.Comment;
 import jakuzie.mongo.CommentRepository;
 import jakuzie.mongo.Post;
+import jakuzie.mongo.PostMongoRepository;
 import jakuzie.mongo.PostRepository;
 import java.time.Instant;
 import java.util.List;

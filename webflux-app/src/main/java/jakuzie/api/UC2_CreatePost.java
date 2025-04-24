@@ -3,6 +3,7 @@ package jakuzie.api;
 import static java.util.Objects.requireNonNull;
 
 import jakuzie.mongo.Post;
+import jakuzie.mongo.PostMongoRepository;
 import jakuzie.mongo.PostRepository;
 import jakuzie.rabbit.EventPublisher;
 import jakuzie.rabbit.EventPublisher.PostCreated;

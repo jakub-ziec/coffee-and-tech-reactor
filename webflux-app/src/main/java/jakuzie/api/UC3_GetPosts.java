@@ -1,6 +1,7 @@
 package jakuzie.api;
 
 import jakuzie.mongo.Post;
+import jakuzie.mongo.PostMongoRepository;
 import jakuzie.mongo.PostRepository;
 import java.time.Instant;
 import lombok.RequiredArgsConstructor;

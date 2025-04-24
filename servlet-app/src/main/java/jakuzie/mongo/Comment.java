@@ -23,4 +23,13 @@ public class Comment {
   private String authorName;
   private Instant createdAt;
 
+  public Comment(UUID postId, String content, String authorName) {
+    this(
+        UUID.randomUUID(),
+        postId,
+        content,
+        authorName,
+        Instant.now());
+  }
+
 }

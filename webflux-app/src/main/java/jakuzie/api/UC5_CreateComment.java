@@ -5,7 +5,9 @@ import jakuzie.exception.ResourceNotFoundException;
 import jakuzie.mongo.Comment;
 import jakuzie.mongo.CommentRepository;
 import jakuzie.mongo.Post;
+import jakuzie.mongo.PostMongoRepository;
 import jakuzie.mongo.PostRepository;
+import jakuzie.rest.CommentCheckerClient;
 import java.security.Principal;
 import java.time.Instant;
 import java.util.List;
@@ -28,26 +30,21 @@ public class UC5_CreateComment {
 
   private final PostRepository postRepository;
   private final CommentRepository commentRepository;
+  private final CommentCheckerClient commentCheckerClient;
 
   @PostMapping("/posts/{postId}/comments")
   @PreAuthorize("isAuthenticated()")
-  public Mono<Void> getPost(@PathVariable UUID postId, @RequestBody CreateCommentRequest request) {
-    Mono<Post> postMono = postRepository.findById(postId)
-        .switchIfEmpty(Mono.error(new ResourceNotFoundException()));
-
-    Mono<Boolean> isUnlockedMono = postMono.flatMap(
-        post -> getLoggedInUserName().flatMap(user -> isUnlocked(post.getAuthorName(), user)));
-    Mono<Boolean> isSafeMono = postMono.flatMap(post -> isSafe(post.getContent(), request.comment()));
-
-    Mono<Boolean> isSafeAndUnlockedMono = Mono.zip(isSafeMono, isUnlockedMono, (isSafe, isUnlocked) -> isSafe && isUnlocked);
-
-    Mono<Comment> commentMono = getLoggedInUserName().flatMap(
-        user -> commentRepository.save(new Comment(postId, request.comment(), user)));
-
-    return isSafeAndUnlockedMono
+  public Mono<Void> createPost(@PathVariable UUID postId, @RequestBody CreateCommentRequest request) {
+    return postRepository.findById(postId)
+        .switchIfEmpty(Mono.error(new ResourceNotFoundException()))
+        .flatMap(post -> Mono.zip(
+            isSafe(post.getContent(), request.comment()),
+            getLoggedInUserName().flatMap(user -> isUnlocked(post.getAuthorName(), user)),
+            (isSafe, isUnlocked) -> isSafe && isUnlocked))
         .filter(Boolean::booleanValue)
         .switchIfEmpty(Mono.error(new CommandRejectedException()))
-        .flatMap(aBoolean -> commentMono)
+        .flatMap(canComment -> getLoggedInUserName().flatMap(
+            user -> commentRepository.save(new Comment(postId, request.comment(), user))))
         .then();
   }
 
@@ -58,35 +55,14 @@ public class UC5_CreateComment {
   }
 
   private Mono<Boolean> isUnlocked(String postAuthor, String commentAuthor) {
-    return Mono.just(true);
+    return commentCheckerClient.isAuthorUnlocked(postAuthor, commentAuthor);
   }
 
   private Mono<Boolean> isSafe(String postContent, String comment) {
-    return Mono.just(true);
+    return commentCheckerClient.isCommentSafe(postContent, comment);
   }
 
-  public record CreateCommentRequest(String comment, String author) {
-  }
-
-  public record PostDetailsResponse(
-      String id,
-      String title,
-      String content,
-      String author,
-      Instant createdAt,
-      List<CommentResponse> comments) {
-
-    public PostDetailsResponse(Post post, List<CommentResponse> comments) {
-      this(post.getId().toString(), post.getTitle(), post.getContent(), post.getAuthorName(), post.getCreatedAt(),
-          comments);
-    }
-  }
-
-  public record CommentResponse(String content, String author, String createdAt) {
-
-    public CommentResponse(Comment comment) {
-      this(comment.getContent(), comment.getAuthorName(), comment.getCreatedAt().toString());
-    }
+  public record CreateCommentRequest(String comment) {
 
   }
 

@@ -50,6 +50,34 @@ class FakeRemoteService {
         this
     }
 
+    def stubIsCommentSafeRespondsOk(boolean safe) {
+        wireMockServer.stubFor(
+                post(urlEqualTo("/safety-check"))
+                        .willReturn(aResponse()
+                                .withStatus(200)
+                                .withHeader("Content-Type", "application/json")
+                                .withBody(asJsonString([
+                                        "safe": safe
+                                ]))
+                        )
+        )
+        this
+    }
+
+    def stubIsAuthorUnlockedRespondsOk(boolean unlocked) {
+        wireMockServer.stubFor(
+                post(urlEqualTo("/author-check"))
+                        .willReturn(aResponse()
+                                .withStatus(200)
+                                .withHeader("Content-Type", "application/json")
+                                .withBody(asJsonString([
+                                        "unlocked": unlocked
+                                ]))
+                        )
+        )
+        this
+    }
+
     def setGlobalFixedDelay(Duration delay) {
         wireMockServer.setGlobalFixedDelay(delay.toMillis().intValue())
         this

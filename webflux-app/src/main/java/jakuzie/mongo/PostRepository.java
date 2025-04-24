@@ -1,8 +1,14 @@
 package jakuzie.mongo;
 
 import java.util.UUID;
-import org.springframework.data.mongodb.repository.ReactiveMongoRepository;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
-public interface PostRepository extends ReactiveMongoRepository<Post, UUID> {
+public interface PostRepository {
 
+  Mono<Post> findById(UUID id);
+
+  Flux<Post> findAll();
+
+  Mono<Post> save(Post post);
 }

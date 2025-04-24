@@ -4,7 +4,7 @@ import jakuzie.exception.InvalidEmailException;
 import jakuzie.mongo.User;
 import jakuzie.mongo.UserRepository;
 import jakuzie.rest.AvatarClient;
-import jakuzie.rest.EmailClient;
+import jakuzie.rest.EmailValidatorClient;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -17,12 +17,12 @@ import org.springframework.web.bind.annotation.RestController;
 public class UC1_CreateUser {
 
   private final UserRepository userRepository;
-  private final EmailClient emailClient;
+  private final EmailValidatorClient emailValidatorClient;
   private final AvatarClient avatarClient;
 
   @PostMapping("/users")
   public User createUser(@RequestBody CreateUserRequest request) {
-    var emailValid = emailClient.isEmailValid(request.email());
+    var emailValid = emailValidatorClient.isEmailValid(request.email());
     if (!emailValid) {
       throw new InvalidEmailException(request.email());
     }

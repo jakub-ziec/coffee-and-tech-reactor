@@ -7,19 +7,14 @@ import io.restassured.RestAssured
 import io.restassured.filter.log.RequestLoggingFilter
 import io.restassured.filter.log.ResponseLoggingFilter
 import io.restassured.http.ContentType
-import io.restassured.specification.RequestSpecification
-import jakuzie.WebFluxApplication
 import jakuzie.email.EmailSender
 import jakuzie.mongo.CommentRepository
-import jakuzie.mongo.PostRepository
-import jakuzie.rabbit.RabbitConfig
+import jakuzie.mongo.PostMongoRepository
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.cache.CacheManager
-import org.springframework.context.annotation.Import
 import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder
 import org.springframework.test.context.ActiveProfiles
-import org.springframework.test.context.ContextConfiguration
 import spock.lang.Shared
 import spock.lang.Specification
 
@@ -45,7 +40,7 @@ abstract class BaseSpringTest extends Specification {
     EmailSender emailSender
 
     @Autowired
-    PostRepository postRepository
+    PostMongoRepository postRepository
 
     @Autowired
     CommentRepository commentRepository
