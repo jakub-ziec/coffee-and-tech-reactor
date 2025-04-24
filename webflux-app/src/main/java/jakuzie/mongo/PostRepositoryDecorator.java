@@ -45,4 +45,20 @@ public class PostRepositoryDecorator implements PostRepository {
   public Mono<Post> save(Post post) {
     return delegate.save(post);
   }
+
+  @Override
+  public Flux<Post> findAllById(Iterable<UUID> postIds) {
+    return delegate.findAllById(postIds);
+  }
+
+  @Override
+  public Flux<Post> saveAll(Iterable<Post> posts) {
+    return delegate.saveAll(posts);
+  }
+
+  @Override
+  public Mono<Void> deleteAll() {
+    return delegate.deleteAll();
+  }
+
 }

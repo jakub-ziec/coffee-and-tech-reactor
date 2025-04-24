@@ -11,4 +11,10 @@ public interface PostRepository {
   Flux<Post> findAll();
 
   Mono<Post> save(Post post);
+
+  Flux<Post> findAllById(Iterable<UUID> postIds);
+
+  Flux<Post> saveAll(Iterable<Post> posts);
+
+  Mono<Void> deleteAll();
 }

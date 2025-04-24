@@ -15,16 +15,15 @@ spring:
     mongodb:
       uri: mongodb://localhost:27017/test?replicaSet=rs0
   cloud:
-#    function:
-#      definition: foo;onLikeEvent
-#    stream:
-#      bindings:
-#        onLikeEvent-in-0:
-#          destination: likes
-#          group: flux
-  #      onLikeEvent-out-0:
-  #        destination: liked-post-titles
-
+    function:
+      definition: onLikeEvent
+    stream:
+      bindings:
+        onLikeEvent-in-0:
+          destination: likes
+          group: flux
+        onLikeEvent-out-0:
+          destination: trending-posts
 
 app:
   remote-service-url: http://localhost:9999

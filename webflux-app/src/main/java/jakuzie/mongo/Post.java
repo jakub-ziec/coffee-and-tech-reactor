@@ -32,4 +32,13 @@ public class Post {
         Instant.now());
   }
 
+  public Post(UUID id, String title, String content, String authorName) {
+    this(
+        id,
+        title,
+        content,
+        authorName,
+        Instant.now());
+  }
+
 }
